@@ -32,7 +32,7 @@ export class AppComponent {
     for(let i=0;i<32;++i)
     this.registers.push(0);
   }
-  fileChanged(e: { target: { files: any[]; }; }) {
+  fileChanged(e:any) {
       this.file = e.target.files[0];
   }
   uploadDocument() {
