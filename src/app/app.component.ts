@@ -32,7 +32,7 @@ export class AppComponent {
     for(let i=0;i<32;++i)
     this.registers.push(0);
   }
-  fileChanged(e) {
+  fileChanged(e: { target: { files: any[]; }; }) {
       this.file = e.target.files[0];
   }
   uploadDocument() {
@@ -247,15 +247,15 @@ export class AppComponent {
                 if(this.code[pointer][j+1]=='d'&&this.code[pointer][j+2]=='d')
                 {
                   j=j+3;
-                  let a:number | undefined = 0, b:number|undefined =0, c:number|undefined =0;
+                  let a:number = 0, b:number =0, c:number =0;
                   if(this.code[pointer][j]=='$')
                   {
                     this.temp=this.code[pointer].substring(j,j+3);
-                    a=this.reg_name.get(this.temp);
+                    a=Number(this.reg_name.get(this.temp));
                     this.temp=this.code[pointer].substring(j+4,j+7);
-                    b=this.reg_name.get(this.temp);
+                    b=Number(this.reg_name.get(this.temp));
                     this.temp=this.code[pointer].substring(j+8,j+11);
-                    c=this.reg_name.get(this.temp);
+                    c=Number(this.reg_name.get(this.temp));
                     this.registers[a]=this.registers[b]+this.registers[c];
                   }
                   else
@@ -271,15 +271,15 @@ export class AppComponent {
                 if(this.code[pointer][j+1]=='u'&&this.code[pointer][j+2]=='b')
                 {
                   j=j+3;
-                  let a:number | undefined = 0, b:number|undefined =0, c:number|undefined =0;
+                  let a:number  = 0, b:number =0, c:number =0;
                   if(this.code[pointer][j]=='$')
                   {
                     this.temp=this.code[pointer].substring(j,j+3);
-                    a=this.reg_name.get(this.temp);
+                    a=Number( this.reg_name.get(this.temp));
                     this.temp=this.code[pointer].substring(j+4,j+7);
-                    b=this.reg_name.get(this.temp);
+                    b=Number (this.reg_name.get(this.temp));
                     this.temp=this.code[pointer].substring(j+8,j+11);
-                    c=this.reg_name.get(this.temp);
+                    c=Number(this.reg_name.get(this.temp));
                     this.registers[a]=this.registers[b]-this.registers[c];
                   }
                   else
@@ -292,13 +292,13 @@ export class AppComponent {
                 {
                   //srl r1,r2,num->r1=r2*2^-num
                   j=j+3;
-                  let a:number | undefined = 0, b:number|undefined =0, c:number|undefined =0;
+                  let a:number  = 0, b:number =0, c:number =0;
                   if(this.code[pointer][j]=='$')
                   {
                     this.temp=this.code[pointer].substring(j,j+3);
-                    a=this.reg_name.get(this.temp);
+                    a=Number(this.reg_name.get(this.temp));
                     this.temp=this.code[pointer].substring(j+4,j+7);
-                    b=this.reg_name.get(this.temp);
+                    b=Number(this.reg_name.get(this.temp));
                     this.temp=this.code[pointer].substring(j+8,this.code[pointer].length);
                     c=parseInt(this.temp) ;
                     this.registers[a]=Math.floor( this.registers[b]/Math.pow(2,c) );
@@ -316,15 +316,15 @@ export class AppComponent {
                 if(this.code[pointer][j+1]=='u'&&this.code[pointer][j+2]=='l')
                 {
                   j=j+3;
-                  let a:number | undefined = 0, b:number|undefined =0, c:number|undefined =0;
+                  let a:number  = 0, b:number=0, c:number=0;
                   if(this.code[pointer][j]=='$')
                   {
                     this.temp=this.code[pointer].substring(j,j+3);
-                    a=this.reg_name.get(this.temp);
+                    a=Number(this.reg_name.get(this.temp));
                     this.temp=this.code[pointer].substring(j+4,j+7);
-                    b=this.reg_name.get(this.temp);
+                    b=Number(this.reg_name.get(this.temp));
                     this.temp=this.code[pointer].substring(j+8,j+11);
-                    c=this.reg_name.get(this.temp);
+                    c=Number(this.reg_name.get(this.temp));
                     this.registers[a]=this.registers[b]*this.registers[c];
                   }
                   else
@@ -340,15 +340,15 @@ export class AppComponent {
                 if(this.code[pointer][j+1]=='i'&&this.code[pointer][j+2]=='v')
                 {
                   j=j+3;
-                  let a:number | undefined = 0, b:number|undefined =0, c:number|undefined =0;
+                  let a:number = 0, b:number =0, c:number =0;
                   if(this.code[pointer][j]=='$')
                   {
                     this.temp=this.code[pointer].substring(j,j+3);
-                    a=this.reg_name.get(this.temp);
+                    a=Number(this.reg_name.get(this.temp));
                     this.temp=this.code[pointer].substring(j+4,j+7);
-                    b=this.reg_name.get(this.temp);
+                    b=Number(this.reg_name.get(this.temp));
                     this.temp=this.code[pointer].substring(j+8,j+11);
-                    c=this.reg_name.get(this.temp);
+                    c=Number(this.reg_name.get(this.temp));
                     this.registers[a]=Math.floor( this.registers[b]/this.registers[c]);
                   }
                   else
@@ -364,13 +364,13 @@ export class AppComponent {
                 if(this.code[pointer][j+1]=='n'&&this.code[pointer][j+2]=='e')
                 {
                   j=j+3;
-                  let a:number | undefined = 0, b:number|undefined =0, c:number|undefined =0;
+                  let a:number  = 0, b:number =0, c:number =0;
                   if(this.code[pointer][j]=='$')
                   {
                     this.temp=this.code[pointer].substring(j,j+3);
-                    a=this.reg_name.get(this.temp);
+                    a=Number(this.reg_name.get(this.temp));
                     this.temp=this.code[pointer].substring(j+4,j+7);
-                    b=this.reg_name.get(this.temp);
+                    b=Number(this.reg_name.get(this.temp));
                     this.temp=this.code[pointer].substring(j+8,this.code[pointer].length);
                     if(this.registers[a]!=this.registers[b])
                     pointer=this.find(this.temp,this.names,this.index);
@@ -385,13 +385,13 @@ export class AppComponent {
                 else if(this.code[pointer][j+1]=='e'&&this.code[pointer][j+2]=='q')
                 {
                   j=j+3;
-                  let a:number | undefined = 0, b:number|undefined =0, c:number|undefined =0;
+                  let a:number  = 0, b:number =0, c:number =0;
                   if(this.code[pointer][j]=='$')
                   {
                     this.temp=this.code[pointer].substring(j,j+3);
-                    a=this.reg_name.get(this.temp);
+                    a=Number(this.reg_name.get(this.temp));
                     this.temp=this.code[pointer].substring(j+4,j+7);
-                    b=this.reg_name.get(this.temp);
+                    b=Number(this.reg_name.get(this.temp));
                     this.temp=this.code[pointer].substring(j+8,this.code[pointer].length);
                     if(this.registers[a]==this.registers[b])
                     pointer=this.find(this.temp,this.names,this.index);
@@ -418,16 +418,16 @@ export class AppComponent {
               if(this.code[pointer][j+1]=='w')
               {
                 j=j+2;
-                let a:number|undefined,c:number|undefined;
+                let a:number,c:number;
                   if(this.code[pointer][j]=='$')
                   {
                     this.temp=this.code[pointer].substring(j,j+3);
-                    a=this.reg_name.get(this.temp);
+                    a=Number(this.reg_name.get(this.temp));
                     c=0;
                     if(this.code[pointer][j+4]!='('&&!(this.code[pointer][j+4]>='0'&&this.code[pointer][j+4]<='9'))
                     {
                       this.temp=this.code[pointer].substring(j+4,this.code[pointer].length);
-                      c=this.variables.get(this.temp);
+                      c=Number(this.variables.get(this.temp));
                     }
                     else
                     {
@@ -441,7 +441,7 @@ export class AppComponent {
                       }
 
                       this.temp=this.code[pointer].substring(j+1,j+4);//$t1
-                      c=this.reg_name.get(this.temp);//c=reg t1 index
+                      c=Number(this.reg_name.get(this.temp));//c=reg t1 index
                       c=this.registers[c];//value of reg t1 aka memory index
                       c+=q/4;//add offset
                       
@@ -453,24 +453,24 @@ export class AppComponent {
               else if(this.code[pointer][j+1]=='a')
               {
                 j=j+2;
-                  let a:number|undefined,c:number|undefined;
+                  let a:number,c:number;
                   if(this.code[pointer][j]=='$')
                   {
                     this.temp=this.code[pointer].substring(j,j+3);
-                    a=this.reg_name.get(this.temp);
+                    a=Number(this.reg_name.get(this.temp));
                     this.temp=this.code[pointer].substring(j+4,this.code[pointer].length);
-                    c=this.variables.get(this.temp);
+                    c=Number(this.variables.get(this.temp));
                     this.registers[a]=c;
                   }
               }
               else if(this.code[pointer][j+1]=='i')
                 {
                   j=j+2;
-                  let a:number|undefined,c:number|undefined;
+                  let a:number,c:number|undefined;
                   if(this.code[pointer][j]=='$')
                   {
                     this.temp=this.code[pointer].substring(j,j+3);
-                    a=this.reg_name.get(this.temp);
+                    a=Number(this.reg_name.get(this.temp));
                     this.temp=this.code[pointer].substring(j+4,this.code[pointer].length);
                     c=parseInt(this.temp) ;
                     this.registers[a]=c;
