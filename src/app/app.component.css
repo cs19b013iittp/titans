@@ -1,0 +1,21 @@
+body{
+    margin:0;
+    background: linear-gradient(to bottom, #333333 0%,#333333 300px,#EDEDED 300px,#EDEDED 100%);
+    font-family:georgia,garamond,serif;font-size:14px;
+}
+img{
+
+width: 250px;
+height: 250px;
+}
+textarea {
+width: 100%;
+min-height: 35em;
+overflow: scroll;
+margin: auto;
+display: inline-block;
+background: #f4f4f9;
+outline: none;
+font-family: Courier, sans-serif;
+font-size: 14px;
+}
