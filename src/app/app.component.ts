@@ -153,14 +153,14 @@ export class AppComponent {
   }
   run()
   {
-    console.log(this.instructions);
+    // console.log(this.instructions);
     this.output=[''];
     this.temp='';
 
     // spliting into individual strings
     this.spliting_lines();
 
-    console.log(this.code);
+    // console.log(this.code);
     //finding all the labels and storing them
     this.labels();
 
