@@ -15,6 +15,7 @@ All the operations that are needed to implement a bubble sort along with the spe
 7. lw, la, li 
 
 For the bubble sort, the output of an array is shown below the code editor.
+The Assembly code for bubble sort is also uploaded with filename "bubble_sort".
 
 ## Development server
 
