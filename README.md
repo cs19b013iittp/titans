@@ -2,6 +2,21 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 11.0.2.
 
+To run
+
+This is a very basic version, so the assembly files that are uploaded should not contain tabs(i.e, \t). Instead use spaces(i.e, " ") only, instead of tabs.
+All the operations that are needed to implement a bubble sort along with the specified ones are included. The operations are:
+1. add, addi
+2. sub, srl, sw
+3. mul
+4. div
+5. bne, beq, blt
+6. j
+7. lw, la, li 
+
+For the bubble sort, the output of an array is shown below the code editor.
+The Assembly code for bubble sort is also uploaded with filename "bubble_sort".
+
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
