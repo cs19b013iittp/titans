@@ -37,7 +37,3 @@ exit2:          addi $t0, $t0, 1
                 j loop1
 
 exit1:
-
-
--------------
-[(ngModel)]="file"
