@@ -46,7 +46,7 @@ export class AppComponent {
   {
     for(let i=0;i<this.instructions.length;i++)
     {
-      if(this.instructions[i]=='\n')
+      if(this.instructions[i]=='\n' )
       {
         if(this.temp!="")
         this.code.push(this.temp);
@@ -60,7 +60,7 @@ export class AppComponent {
       }
       else
       {
-        if(this.instructions[i]!=' ')
+        if(this.instructions[i]!=' ' && this.instructions[i]!='\t')
         this.temp+=this.instructions[i];
       }
     }
@@ -153,14 +153,14 @@ export class AppComponent {
   }
   run()
   {
-    console.log(this.instructions);
+    // console.log(this.instructions);
     this.output=[''];
     this.temp='';
 
     // spliting into individual strings
     this.spliting_lines();
 
-    console.log(this.code);
+    // console.log(this.code);
     //finding all the labels and storing them
     this.labels();
 
@@ -216,7 +216,7 @@ export class AppComponent {
         i++;
       }
     }
-    console.log(this.variables);
+    // console.log(this.variables);
     //finding .text
     flag=Boolean( this.finding_text());
     if(flag)
@@ -229,6 +229,7 @@ export class AppComponent {
         pointer++;
         while(pointer<this.code.length)
         {
+          // console.log(this.memory);
           let j=0;
             let k=j;
             while(++k&&k<this.code[pointer].length)
@@ -244,7 +245,29 @@ export class AppComponent {
             if(this.code[pointer][j]=='a')
             {
                 //add
-                if(this.code[pointer][j+1]=='d'&&this.code[pointer][j+2]=='d')
+                if(this.code[pointer][j+1]=='d'&&this.code[pointer][j+2]=='d' && this.code[pointer][j+3] == 'i')
+                {
+                  j=j+4;
+                  let a:number = 0, b:number =0, c:number =0;
+                  if(this.code[pointer][j]=='$')
+                  {
+                    this.temp=this.code[pointer].substring(j,j+3);
+                    a=Number(this.reg_name.get(this.temp));
+                    this.temp=this.code[pointer].substring(j+4,j+7);
+                    b=Number(this.reg_name.get(this.temp));
+                    this.temp=this.code[pointer].substring(j+8,j+11);
+                    c = parseInt(this.temp, 10);
+                    // c=Number(this.reg_name.get(this.temp));
+                    this.registers[a]=this.registers[b]+c;
+                    // console.log("value of c = " + c);
+                  }
+                  else
+                  {
+                    this.output.push(' error in line '+pointer);
+                    break;
+                  }
+                }
+                else if(this.code[pointer][j+1]=='d'&&this.code[pointer][j+2]=='d')
                 {
                   j=j+3;
                   let a:number = 0, b:number =0, c:number =0;
@@ -308,6 +331,35 @@ export class AppComponent {
                     this.output.push('\n error in line '+pointer);
                     break;
                   }
+                }
+                else if(this.code[pointer][j+1] == 'w')
+                {
+                  j=j+2;
+                  let a:number,c:number=0;
+                  if(this.code[pointer][j]=='$')
+                  {
+                    this.temp=this.code[pointer].substring(j,j+3);
+                    a=Number(this.reg_name.get(this.temp));
+                    c=0;
+                      j=j+4;
+                      let q=0;
+                      while(this.code[pointer][j]!='(')
+                      {
+                        q*=10;
+                        q+=parseInt(this.code[pointer][j],10);
+                        j++;
+                      }
+
+                      this.temp=this.code[pointer].substring(j+1,j+4);//$t1
+                      c=Number(this.reg_name.get(this.temp));//c=reg t1 index
+                      c=this.registers[c];//value of reg t1 aka memory index
+                      c+=q/4;//add offset
+                      
+                    // }
+                    this.memory[c] = String(this.registers[a]);
+                    // this.registers[a]=parseInt( this.memory[c],10);
+                  }
+                  // console.log('sw' + this.memory[c]);
                 }
             }
             else if(this.code[pointer][j]=='m')
@@ -397,12 +449,35 @@ export class AppComponent {
                     pointer=this.find(this.temp,this.names,this.index);
                     
                   }
+                }
+                  else if(this.code[pointer][j+1]=='l'&&this.code[pointer][j+2]=='t')
+                {
+                  j=j+3;
+                  let a:number  = 0, b:number =0, c:number =0;
+                  if(this.code[pointer][j]=='$')
+                  {
+                    this.temp=this.code[pointer].substring(j,j+3);
+                    a=Number(this.reg_name.get(this.temp));
+                    this.temp=this.code[pointer].substring(j+4,j+7);
+                    b=Number(this.reg_name.get(this.temp));
+                    this.temp=this.code[pointer].substring(j+8,this.code[pointer].length);
+                    // console.log(this.registers[a]);
+                    // console.log(this.registers[b]);
+                    if(this.registers[a]<this.registers[b]){
+                      pointer=this.find(this.temp,this.names,this.index);
+                      // console.log(pointer);
+                    }
+                  }
                   else
                   {
                     this.output.push('\n error in line '+pointer);
                     break;
                   }
                 }
+                else{
+                  this.output.push("Error in line " + pointer);
+                }
+              
             }
             else if(this.code[pointer][j]=='j')
             {
@@ -418,7 +493,7 @@ export class AppComponent {
               if(this.code[pointer][j+1]=='w')
               {
                 j=j+2;
-                let a:number,c:number;
+                let a:number=0,c:number;
                   if(this.code[pointer][j]=='$')
                   {
                     this.temp=this.code[pointer].substring(j,j+3);
@@ -428,6 +503,9 @@ export class AppComponent {
                     {
                       this.temp=this.code[pointer].substring(j+4,this.code[pointer].length);
                       c=Number(this.variables.get(this.temp));
+                      // console.log(c);
+                      // console.log(this.temp);
+                      // console.log(parseInt( this.memory[c],10));
                     }
                     else
                     {
@@ -448,6 +526,7 @@ export class AppComponent {
                     }
                     this.registers[a]=parseInt( this.memory[c],10);
                   }
+                  // console.log(this.registers[a]);
               }
               //la $t1,arr
               else if(this.code[pointer][j+1]=='a')
@@ -490,7 +569,15 @@ export class AppComponent {
             pointer++;
         }
     }
+    // console.log(this.memory);
+    let start = 1;
+    let end = parseInt(this.memory[this.memory.length-1], 10);
+    for(; start<=end; start++){
+      this.output.push(this.memory[start]);
+    }
   }
+
+  //to find the labels position
   find(s:string,names:any,index:any)
   {
     let i;
@@ -502,6 +589,8 @@ export class AppComponent {
 
     return -1;
   }
+
+  //for reinitializing everything
   Reinitialize()
   {
     for(let i=0;i<32;++i)
