@@ -29,7 +29,7 @@
 					<button type="button" style="color:grey;" class="btn btn-default b">
 						  <span class="glyphicon glyphicon-th-list"></span> Single Step
 					</button>
-					 <input type="file" [(ngModel)]="file" (change)="fileChanged($event)" style="color:grey;" id="myFile" name="filename"> 
+					 <input type="file" (change)="fileChanged($event)" style="color:grey;" id="myFile" name="filename"> 
 					 <button type="button" style="color:grey;"  class="btn btn-default b" 
 					 (click)="uploadDocument()">Upload File</button>
 				</div>
