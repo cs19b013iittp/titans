@@ -29,9 +29,11 @@
 					<button type="button" style="color:grey;" class="btn btn-default b">
 						  <span class="glyphicon glyphicon-th-list"></span> Single Step
 					</button>
+					<input type="checkbox"  id="myCheck" [(ngModel)]="is_forwarded" > <span class="example-margin" >enable forwarding</span> 
 					 <input type="file" (change)="fileChanged($event)" style="color:grey;" id="myFile" name="filename"> 
 					 <button type="button" style="color:grey;"  class="btn btn-default b" 
 					 (click)="uploadDocument()">Upload File</button>
+					 
 				</div>
 				</div>
 			</div>

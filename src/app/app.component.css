@@ -19,3 +19,8 @@ outline: none;
 font-family: Courier, sans-serif;
 font-size: 14px;
 }
+
+.example-margin {
+    margin: 0 10px;
+    color: grey;
+  }

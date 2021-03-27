@@ -4,7 +4,9 @@ import { Component } from '@angular/core';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
+  
 })
+
 export class AppComponent {
   title = 'titans';
   file:any;
@@ -14,7 +16,12 @@ export class AppComponent {
   public code=[''];
   public temp='';
   output=[''];
+  public is_forwarded=false;
   public names=[''];
+  public clocks=0;
+    public total_instructions=0;
+    public stalls=0;
+    public hazard=[-1];
   public memory=[''];
   public index=[-1];
   public variables=new Map(
@@ -32,6 +39,7 @@ export class AppComponent {
     for(let i=0;i<32;++i)
     this.registers.push(0);
   }
+  
   fileChanged(e:any) {
       this.file = e.target.files[0];
   }
@@ -151,6 +159,7 @@ export class AppComponent {
     }
     return i;
   }
+  
   run()
   {
     // console.log(this.instructions);
@@ -160,7 +169,6 @@ export class AppComponent {
     // spliting into individual strings
     this.spliting_lines();
 
-    // console.log(this.code);
     //finding all the labels and storing them
     this.labels();
 
@@ -227,6 +235,7 @@ export class AppComponent {
           this.output.push("main not found"); 
         }
         pointer++;
+        this.clocks=4;
         while(pointer<this.code.length)
         {
           // console.log(this.memory);
@@ -242,9 +251,12 @@ export class AppComponent {
             }
             if(k<this.code[pointer].length)
             continue;
+            this.total_instructions++;
+            this.clocks++;
             if(this.code[pointer][j]=='a')
             {
-                //add
+              
+                //addi
                 if(this.code[pointer][j+1]=='d'&&this.code[pointer][j+2]=='d' && this.code[pointer][j+3] == 'i')
                 {
                   j=j+4;
@@ -260,6 +272,15 @@ export class AppComponent {
                     // c=Number(this.reg_name.get(this.temp));
                     this.registers[a]=this.registers[b]+c;
                     // console.log("value of c = " + c);
+
+                    if(!(this.hazard[0]!=b&&this.hazard[1]!=b))
+                    {
+                      this.stalls+=2;
+                      this.clocks+=2;
+                    }
+                    this.hazard.push(a);
+                    while(this.hazard.length>2)
+                    this.hazard.shift();
                   }
                   else
                   {
@@ -267,6 +288,7 @@ export class AppComponent {
                     break;
                   }
                 }
+                //add
                 else if(this.code[pointer][j+1]=='d'&&this.code[pointer][j+2]=='d')
                 {
                   j=j+3;
@@ -280,6 +302,15 @@ export class AppComponent {
                     this.temp=this.code[pointer].substring(j+8,j+11);
                     c=Number(this.reg_name.get(this.temp));
                     this.registers[a]=this.registers[b]+this.registers[c];
+
+                    if((this.hazard[0]==b||this.hazard[1]==b||this.hazard[0]==c||this.hazard[1]==c))
+                    {
+                      this.stalls+=2;
+                      this.clocks+=3;
+                    }
+                    this.hazard.push(a);
+                    while(this.hazard.length>2)
+                    this.hazard.shift();
                   }
                   else
                   {
@@ -304,6 +335,15 @@ export class AppComponent {
                     this.temp=this.code[pointer].substring(j+8,j+11);
                     c=Number(this.reg_name.get(this.temp));
                     this.registers[a]=this.registers[b]-this.registers[c];
+
+                    if(!(this.hazard[0]!=b&&this.hazard[1]!=b||this.hazard[0]!=c&&this.hazard[1]!=c))
+                    {
+                      this.stalls+=2;
+                      this.clocks+=2;
+                    }
+                    this.hazard.push(a);
+                    while(this.hazard.length>2)
+                    this.hazard.shift();
                   }
                   else
                   {
@@ -325,6 +365,15 @@ export class AppComponent {
                     this.temp=this.code[pointer].substring(j+8,this.code[pointer].length);
                     c=parseInt(this.temp) ;
                     this.registers[a]=Math.floor( this.registers[b]/Math.pow(2,c) );
+
+                    if(!(this.hazard[0]!=b&&this.hazard[1]!=b))
+                    {
+                      this.stalls+=2;
+                      this.clocks+=2;
+                    }
+                    this.hazard.push(a);
+                    while(this.hazard.length>2)
+                    this.hazard.shift();
                   }
                   else
                   {
@@ -378,6 +427,15 @@ export class AppComponent {
                     this.temp=this.code[pointer].substring(j+8,j+11);
                     c=Number(this.reg_name.get(this.temp));
                     this.registers[a]=this.registers[b]*this.registers[c];
+
+                    if(!(this.hazard[0]!=b&&this.hazard[1]!=b||this.hazard[0]!=c&&this.hazard[1]!=c))
+                    {
+                      this.stalls+=2;
+                      this.clocks+=2;
+                    }
+                    this.hazard.push(a);
+                    while(this.hazard.length>2)
+                    this.hazard.shift();
                   }
                   else
                   {
@@ -402,6 +460,15 @@ export class AppComponent {
                     this.temp=this.code[pointer].substring(j+8,j+11);
                     c=Number(this.reg_name.get(this.temp));
                     this.registers[a]=Math.floor( this.registers[b]/this.registers[c]);
+
+                    if(!(this.hazard[0]!=b&&this.hazard[1]!=b||this.hazard[0]!=c&&this.hazard[1]!=c))
+                    {
+                      this.stalls+=2;
+                      this.clocks+=2;
+                    }
+                    this.hazard.push(a);
+                    while(this.hazard.length>2)
+                    this.hazard.shift();
                   }
                   else
                   {
@@ -426,6 +493,14 @@ export class AppComponent {
                     this.temp=this.code[pointer].substring(j+8,this.code[pointer].length);
                     if(this.registers[a]!=this.registers[b])
                     pointer=this.find(this.temp,this.names,this.index);
+
+                    if(!(this.hazard[0]!=b&&this.hazard[1]!=b||this.hazard[0]!=a&&this.hazard[1]!=a))
+                    {
+                      this.stalls+=2;
+                      this.clocks+=2;
+                    }
+                    while(this.hazard.length>2)
+                    this.hazard.shift();
                     
                   }
                   else
@@ -447,6 +522,14 @@ export class AppComponent {
                     this.temp=this.code[pointer].substring(j+8,this.code[pointer].length);
                     if(this.registers[a]==this.registers[b])
                     pointer=this.find(this.temp,this.names,this.index);
+
+                    if(!(this.hazard[0]!=b&&this.hazard[1]!=b||this.hazard[0]!=a&&this.hazard[1]!=a))
+                    {
+                      this.stalls+=2;
+                      this.clocks+=2;
+                    }
+                    while(this.hazard.length>2)
+                    this.hazard.shift();
                     
                   }
                 }
@@ -467,6 +550,13 @@ export class AppComponent {
                       pointer=this.find(this.temp,this.names,this.index);
                       // console.log(pointer);
                     }
+                    if(!(this.hazard[0]!=b&&this.hazard[1]!=b||this.hazard[0]!=a&&this.hazard[1]!=a))
+                    {
+                      this.stalls+=2;
+                      this.clocks+=2;
+                    }
+                    while(this.hazard.length>2)
+                    this.hazard.shift();
                   }
                   else
                   {
@@ -484,6 +574,7 @@ export class AppComponent {
                 //jump label
                 this.temp=this.code[pointer].substring(j+1,this.code[pointer].length);
                 pointer=this.find(this.temp,this.names,this.index);
+                this.clocks++;
             }
             else if(this.code[pointer][j]=='l')
             {
@@ -575,6 +666,10 @@ export class AppComponent {
     for(; start<=end; start++){
       this.output.push(this.memory[start]);
     }
+    console.log("clocks" +this.clocks);
+    console.log("no.of instru" + this.total_instructions);
+    console.log("stalls"+ this.stalls);
+    console.log("ipc"+ this.total_instructions/this.clocks);
   }
 
   //to find the labels position
@@ -601,6 +696,8 @@ export class AppComponent {
     this.names=[''];
     this.index=[-1];
     this.file=null;
+    this.total_instructions=0;
+    this.stalls=0;
     this.memory=[""];
     this.variables=new Map(
       [
