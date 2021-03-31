@@ -29,6 +29,10 @@
 					<button type="button" style="color:grey;" class="btn btn-default b">
 						  <span class="glyphicon glyphicon-th-list"></span> Single Step
 					</button>
+
+					<label for="checkbox">Enable Forwarding</label>
+					<input type="checkbox" id="checkbox" [(ngModel)]="is_forwarded">
+
 					 <input type="file" (change)="fileChanged($event)" style="color:grey;" id="myFile" name="filename"> 
 					 <button type="button" style="color:grey;"  class="btn btn-default b" 
 					 (click)="uploadDocument()">Upload File</button>
@@ -78,6 +82,21 @@
 			</div>
 		</div>
 		
+		<div class="container-md mb-2">
+			<div class="row">
+				<div class="col-md-12 py-2">
+					<div class="shadow container bg-light">
+						<br>
+						Total no. of Stalls = {{stalls}}
+						<br>
+						Total Clock Cycles  = {{clocks}}
+						<br>
+						IPC = {{IPC}}
+						<br>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
     </body>
 </html>
