@@ -17,6 +17,29 @@ All the operations that are needed to implement a bubble sort along with the spe
 For the bubble sort, the output of an array is shown below the code editor.
 The Assembly code for bubble sort is also uploaded with filename "bubble_sort".
 
+
+# Phase 2
+Implementation:
+We maintained an array(named hazards) for storing the registers whose write back has not yet finished.
+
+Assumptions/Considerations:
+1. The write back stage is assumed to be completed in the first half of the clock cycle.
+2. ID is done in 1st half and RF is done in 2nd half of clock cycle.
+3. When an ID/RF fails it is taken as a stall only.
+4. Data Forwarding is done from EX-MEM to EX, MEM-WB to EX.
+5. For a branch/jump instruction, it is assumed to correct the PC value after the ID/RF stage. So, irrespective of the hazards/dependencies, there will always be a stall after every branch/jump instruction.
+
+In case of no forwarding:
+For every instruction, only next two instructions might cause hazards. So, for every instruction the registers, that are fetched, are checked for hazards, with the last two entries into the array.
+A variety of combinations of instructions are analyzed and the stalls and extra clock cycles are added appropriately. 
+Always the length of the hazards array is maintained as 2.
+
+In case of data forwarding:
+Consecutive arithmetic operations, even if dependencies are present, will not any cause stalls because of forwarding. The only problem is with the load/store/branch/jump instructions.
+
+---> The results of the stalls, no. of clock cycles, no. of instructions executed and IPC is shown at the bottom.
+
+---------------------------------------------------------------------------------------------------------------------------------------------
 ## Development server
 
 The present code is modified so that we will be able to host it on heroku to see the web page go to https://titansapp.herokuapp.com/ . else
