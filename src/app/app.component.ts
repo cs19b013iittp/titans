@@ -165,11 +165,11 @@ export class AppComponent {
   //pipelining without forwarding
   pipeline_wf( operation:string, reg1:number, reg2:number){
       this.total_instructions++;
-      if(reg1===this.hazard[1]||reg2===this.hazard[1]){
+      if(reg1==this.hazard[1]||reg2==this.hazard[1]){
         this.stalls+=2;
         this.clocks+=2;
       }
-      else if(reg1===this.hazard[0]||reg2===this.hazard[0]){
+      else if(reg1==this.hazard[0]||reg2==this.hazard[0]){
         this.stalls+=1;
         this.clocks+=1;
       }
@@ -179,11 +179,7 @@ export class AppComponent {
   pipeline_f(operation:string, reg1:number, reg2:number){
     this.total_instructions++;
     if(reg1==this.hazard[1] || reg2==this.hazard[1]){
-      if(this.prev_op==="lw"||this.prev_op==="sw"){
-        this.stalls+=1;
-        this.clocks+=1;
-      }
-      else if(operation==="bne"||operation==="beq"||operation==="blt"){
+      if(this.prev_op==="la"||this.prev_op==="lw"||this.prev_op==="sw"||operation==="bne"||operation==="beq"||operation==="blt"){
         this.stalls+=1;
         this.clocks+=1;
       }
@@ -192,6 +188,8 @@ export class AppComponent {
 
   run()
   {
+    console.log(this.code);
+
     this.output=[''];
     this.temp='';
 
@@ -257,7 +255,7 @@ export class AppComponent {
     flag=Boolean( this.finding_text());
     if(flag)
     {
-        let pointer=this.find('Main',this.names,this.index);
+        let pointer=this.find('main',this.names,this.index);
         if(pointer==-1)
         {
           this.output.push("Main not found"); 
@@ -658,21 +656,29 @@ export class AppComponent {
                       this.temp=this.code[pointer].substring(j+1,j+4);//$t1
                       c=Number(this.reg_name.get(this.temp));//c=reg t1 index
                       c=this.registers[c];//value of reg t1 aka memory index
+                      if(!this.is_forwarded){
+                        this.pipeline_wf("lw", c, -2);
+                      }
+                      else{
+                        this.pipeline_f("lw", c, -2);
+                        this.prev_op = "lw";
+                      }
+                      this.hazard.push(a);
+                      this.hazard.shift();
                       c+=q/4;//add offset
                       
                     }
                     this.registers[a]=parseInt( this.memory[c],10);
 
-                    if(!this.is_forwarded){
-                      this.pipeline_wf("lw", c, -2);
-                    }
-                    else{
-                      this.pipeline_f("lw", c, -2);
-                      this.prev_op = "lw";
-                    }
-                    this.hazard.push(a);
-                    this.hazard.shift();
-                    this.total_instructions++;
+                    // if(!this.is_forwarded){
+                    //   this.pipeline_wf("lw", c, -2);
+                    // }
+                    // else{
+                    //   this.pipeline_f("lw", c, -2);
+                    //   this.prev_op = "lw";
+                    // }
+                    // this.hazard.push(a);
+                    // this.hazard.shift();
                   }
               }
               //la $t1,arr
@@ -688,6 +694,15 @@ export class AppComponent {
                     c=Number(this.variables.get(this.temp));
                     this.registers[a]=c;
 
+                    // if(!this.is_forwarded){
+                    //   this.pipeline_wf("la", a, -2);
+                    // }
+                    // else{
+                    //   this.pipeline_f("la", a, -2);
+                    //   this.prev_op = "la";
+                    // }
+                    // this.hazard.push(a);
+                    // this.hazard.shift();
                     this.prev_op = "la";
                     this.hazard.push(a);
                     this.hazard.shift();
@@ -726,11 +741,11 @@ export class AppComponent {
             pointer++;
         }
     }
-    let start = 1;
-    let end = parseInt(this.memory[this.memory.length-1], 10);
-    for(; start<=end; start++){
-      this.output.push(this.memory[start]);
-    }
+    // let start = 1;
+    // let end = parseInt(this.memory[this.memory.length-1], 10);
+    // for(; start<=end; start++){
+    //   this.output.push(this.memory[start]);
+    // }
 
     // console.log("stalls " + this.stalls);
     // console.log("clocks "+ this.clocks);
