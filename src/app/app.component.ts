@@ -4,7 +4,9 @@ import { Component } from '@angular/core';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
+  
 })
+
 export class AppComponent {
   title = 'titans';
   file:any;
@@ -42,6 +44,7 @@ export class AppComponent {
     for(let i=0;i<32;++i)
     this.registers.push(0);
   }
+  
   fileChanged(e:any) {
       this.file = e.target.files[0];
   }
@@ -168,10 +171,16 @@ export class AppComponent {
       if(reg1==this.hazard[1]||reg2==this.hazard[1]){
         this.stalls+=2;
         this.clocks+=2;
+        this.hazard.shift();
+        this.hazard.push(-1);
       }
       else if(reg1==this.hazard[0]||reg2==this.hazard[0]){
         this.stalls+=1;
         this.clocks+=1;
+        if(this.stalls%2==0){
+          this.hazard.shift();
+          this.hazard.push(-1);
+        }
       }
   }
 
@@ -261,6 +270,7 @@ export class AppComponent {
           this.output.push("Main not found"); 
         }
         pointer++;
+        this.clocks=4;
         while(pointer<this.code.length)
         {
           let j=0;
@@ -278,7 +288,8 @@ export class AppComponent {
             this.clocks++;
             if(this.code[pointer][j]=='a')
             {
-                //add
+              
+                //addi
                 if(this.code[pointer][j+1]=='d'&&this.code[pointer][j+2]=='d' && this.code[pointer][j+3] == 'i')
                 {
                   j=j+4;
@@ -309,6 +320,7 @@ export class AppComponent {
                     break;
                   }
                 }
+                //add
                 else if(this.code[pointer][j+1]=='d'&&this.code[pointer][j+2]=='d')
                 {
                   j=j+3;
@@ -527,6 +539,14 @@ export class AppComponent {
                     this.temp=this.code[pointer].substring(j+8,this.code[pointer].length);
                     if(this.registers[a]!=this.registers[b])
                     pointer=this.find(this.temp,this.names,this.index);
+
+                    // if(!(this.hazard[0]!=b&&this.hazard[1]!=b||this.hazard[0]!=a&&this.hazard[1]!=a))
+                    // {
+                    //   this.stalls+=2;
+                    //   this.clocks+=2;
+                    // }
+                    while(this.hazard.length>2)
+                    this.hazard.shift();
                     
                     if(!this.is_forwarded){
                       this.pipeline_wf("bne", a, b);
@@ -600,6 +620,13 @@ export class AppComponent {
                     if(this.registers[a]<this.registers[b]){
                       pointer=this.find(this.temp,this.names,this.index);
                     }
+                    // if(!(this.hazard[0]!=b&&this.hazard[1]!=b||this.hazard[0]!=a&&this.hazard[1]!=a))
+                    // {
+                    //   this.stalls+=2;
+                    //   this.clocks+=2;
+                    // }
+                    // while(this.hazard.length>2)
+                    // this.hazard.shift();
                   }
                   else
                   {
@@ -655,7 +682,7 @@ export class AppComponent {
 
                       this.temp=this.code[pointer].substring(j+1,j+4);//$t1
                       c=Number(this.reg_name.get(this.temp));//c=reg t1 index
-                      c=this.registers[c];//value of reg t1 aka memory index
+                      // c=this.registers[c];//value of reg t1 aka memory index
                       if(!this.is_forwarded){
                         this.pipeline_wf("lw", c, -2);
                       }
@@ -665,8 +692,9 @@ export class AppComponent {
                       }
                       this.hazard.push(a);
                       this.hazard.shift();
+
                       c+=q/4;//add offset
-                      
+                      c = this.registers[c];
                     }
                     this.registers[a]=parseInt( this.memory[c],10);
 
@@ -751,7 +779,7 @@ export class AppComponent {
     // console.log("clocks "+ this.clocks);
     // console.log("inst "+ this.total_instructions);
 
-    this.clocks += 4;
+    // this.clocks += 4;
     this.IPC = this.total_instructions/this.clocks;
   }
 
@@ -788,6 +816,8 @@ export class AppComponent {
     this.names=[''];
     this.index=[-1];
     this.file=null;
+    this.total_instructions=0;
+    this.stalls=0;
     this.memory=[""];
     this.variables=new Map(
       [

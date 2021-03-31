@@ -19,6 +19,7 @@ The Assembly code for bubble sort is also uploaded with filename "bubble_sort".
 
 ## Development server
 
+The present code is modified so that we will be able to host it on heroku to see the web page go to https://titansapp.herokuapp.com/ . else
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
 ## Code scaffolding
