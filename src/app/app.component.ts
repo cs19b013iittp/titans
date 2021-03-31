@@ -197,8 +197,6 @@ export class AppComponent {
 
   run()
   {
-    console.log(this.code);
-
     this.output=[''];
     this.temp='';
 
@@ -539,12 +537,6 @@ export class AppComponent {
                     this.temp=this.code[pointer].substring(j+8,this.code[pointer].length);
                     if(this.registers[a]!=this.registers[b])
                     pointer=this.find(this.temp,this.names,this.index);
-
-                    // if(!(this.hazard[0]!=b&&this.hazard[1]!=b||this.hazard[0]!=a&&this.hazard[1]!=a))
-                    // {
-                    //   this.stalls+=2;
-                    //   this.clocks+=2;
-                    // }
                     while(this.hazard.length>2)
                     this.hazard.shift();
                     
@@ -620,13 +612,6 @@ export class AppComponent {
                     if(this.registers[a]<this.registers[b]){
                       pointer=this.find(this.temp,this.names,this.index);
                     }
-                    // if(!(this.hazard[0]!=b&&this.hazard[1]!=b||this.hazard[0]!=a&&this.hazard[1]!=a))
-                    // {
-                    //   this.stalls+=2;
-                    //   this.clocks+=2;
-                    // }
-                    // while(this.hazard.length>2)
-                    // this.hazard.shift();
                   }
                   else
                   {
@@ -697,16 +682,6 @@ export class AppComponent {
                       c = this.registers[c];
                     }
                     this.registers[a]=parseInt( this.memory[c],10);
-
-                    // if(!this.is_forwarded){
-                    //   this.pipeline_wf("lw", c, -2);
-                    // }
-                    // else{
-                    //   this.pipeline_f("lw", c, -2);
-                    //   this.prev_op = "lw";
-                    // }
-                    // this.hazard.push(a);
-                    // this.hazard.shift();
                   }
               }
               //la $t1,arr
@@ -722,15 +697,6 @@ export class AppComponent {
                     c=Number(this.variables.get(this.temp));
                     this.registers[a]=c;
 
-                    // if(!this.is_forwarded){
-                    //   this.pipeline_wf("la", a, -2);
-                    // }
-                    // else{
-                    //   this.pipeline_f("la", a, -2);
-                    //   this.prev_op = "la";
-                    // }
-                    // this.hazard.push(a);
-                    // this.hazard.shift();
                     this.prev_op = "la";
                     this.hazard.push(a);
                     this.hazard.shift();
@@ -769,17 +735,7 @@ export class AppComponent {
             pointer++;
         }
     }
-    // let start = 1;
-    // let end = parseInt(this.memory[this.memory.length-1], 10);
-    // for(; start<=end; start++){
-    //   this.output.push(this.memory[start]);
-    // }
-
-    // console.log("stalls " + this.stalls);
-    // console.log("clocks "+ this.clocks);
-    // console.log("inst "+ this.total_instructions);
-
-    // this.clocks += 4;
+    
     this.IPC = this.total_instructions/this.clocks;
   }
 
