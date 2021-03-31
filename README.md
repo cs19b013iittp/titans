@@ -38,6 +38,7 @@ In case of data forwarding:
 Consecutive arithmetic operations, even if dependencies are present, will not any cause stalls because of forwarding. The only problem is with the load/store/branch/jump instructions.
 
 ---> The results of the stalls, no. of clock cycles, no. of instructions executed and IPC is shown at the bottom.
+---> Also the instructions where the stall occurs are outputted at the bottom.
 
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ## Development server
