@@ -19,6 +19,7 @@ export class AppComponent {
   public hazard=[-1, -1];
   public prev_op = "";
   public IPC = 0;
+  public stalled_inst = [""];
 
   public sometext='';
   public registers=[0];
@@ -166,13 +167,15 @@ export class AppComponent {
   }
 
   //pipelining without forwarding
-  pipeline_wf( operation:string, reg1:number, reg2:number){
+  pipeline_wf( operation:string, reg1:number, reg2:number, pointer:number){
       this.total_instructions++;
       if(reg1==this.hazard[1]||reg2==this.hazard[1]){
         this.stalls+=2;
         this.clocks+=2;
         this.hazard.shift();
         this.hazard.push(-1);
+        if(this.stalled_inst[this.stalled_inst.length-1]!=this.code[pointer])
+          this.stalled_inst.push(this.code[pointer]);
       }
       else if(reg1==this.hazard[0]||reg2==this.hazard[0]){
         this.stalls+=1;
@@ -181,16 +184,20 @@ export class AppComponent {
           this.hazard.shift();
           this.hazard.push(-1);
         }
+        if(this.stalled_inst[this.stalled_inst.length-1]!=this.code[pointer])
+          this.stalled_inst.push(this.code[pointer]);
       }
   }
 
   //with forwarding
-  pipeline_f(operation:string, reg1:number, reg2:number){
+  pipeline_f(operation:string, reg1:number, reg2:number, pointer:number){
     this.total_instructions++;
     if(reg1==this.hazard[1] || reg2==this.hazard[1]){
       if(this.prev_op==="la"||this.prev_op==="lw"||this.prev_op==="sw"||operation==="bne"||operation==="beq"||operation==="blt"){
         this.stalls+=1;
         this.clocks+=1;
+        if(this.stalled_inst[this.stalled_inst.length-1]!=this.code[pointer])
+          this.stalled_inst.push(this.code[pointer]);
       }
     }
   }
@@ -303,10 +310,10 @@ export class AppComponent {
                     this.registers[a]=this.registers[b]+c;
                     
                     if(!this.is_forwarded){
-                      this.pipeline_wf("addi", b, -2);
+                      this.pipeline_wf("addi", b, -2, pointer);
                     }
                     else{
-                      this.pipeline_f("addi", b, -2);
+                      this.pipeline_f("addi", b, -2, pointer);
                       this.prev_op="addi";
                     }
                     this.hazard.push(a);
@@ -334,10 +341,10 @@ export class AppComponent {
                     this.registers[a]=this.registers[b]+this.registers[c];
 
                     if(!this.is_forwarded){
-                      this.pipeline_wf("add", b, c);
+                      this.pipeline_wf("add", b, c, pointer);
                     }
                     else{
-                      this.pipeline_f("add", b, c);
+                      this.pipeline_f("add", b, c, pointer);
                       this.prev_op="add";
                     }
                     this.hazard.push(a);
@@ -368,10 +375,10 @@ export class AppComponent {
                     this.registers[a]=this.registers[b]-this.registers[c];
 
                     if(!this.is_forwarded){
-                      this.pipeline_wf("sub", b, c);
+                      this.pipeline_wf("sub", b, c, pointer);
                     }
                     else{
-                      this.pipeline_f("sub", b, c);
+                      this.pipeline_f("sub", b, c, pointer);
                       this.prev_op="sub";
                     }
                     this.hazard.push(a);
@@ -399,10 +406,10 @@ export class AppComponent {
                     this.registers[a]=Math.floor( this.registers[b]/Math.pow(2,c) );
 
                     if(!this.is_forwarded){
-                      this.pipeline_wf("srl", b, -2);
+                      this.pipeline_wf("srl", b, -2, pointer);
                     }
                     else{
-                      this.pipeline_f("srl", b, -2);
+                      this.pipeline_f("srl", b, -2, pointer);
                     }
                     this.hazard.push(a);
                     this.hazard.shift();
@@ -435,10 +442,10 @@ export class AppComponent {
                       c=Number(this.reg_name.get(this.temp));//c=reg t1 index
 
                       if(!this.is_forwarded){
-                        this.pipeline_wf("sw", a, -2);
+                        this.pipeline_wf("sw", a, -2, pointer);
                       }
                       else{
-                        this.pipeline_f("sw", a, -2);
+                        this.pipeline_f("sw", a, -2, pointer);
                         this.prev_op = "sw";
                       }
 
@@ -471,10 +478,10 @@ export class AppComponent {
                     this.registers[a]=this.registers[b]*this.registers[c];
 
                     if(!this.is_forwarded){
-                      this.pipeline_wf("mul", b, c);
+                      this.pipeline_wf("mul", b, c, pointer);
                     }
                     else{
-                      this.pipeline_f("mul", b, c);
+                      this.pipeline_f("mul", b, c, pointer);
                       this.prev_op = "mul";
                     }
                     this.hazard.push(a);
@@ -505,10 +512,10 @@ export class AppComponent {
                     this.registers[a]=Math.floor( this.registers[b]/this.registers[c]);
 
                     if(!this.is_forwarded){
-                      this.pipeline_wf("div", b, c);
+                      this.pipeline_wf("div", b, c, pointer);
                     }
                     else{
-                      this.pipeline_f("div", b, c);
+                      this.pipeline_f("div", b, c, pointer);
                       this.prev_op = "div";
                     }
                     this.hazard.push(a);
@@ -537,18 +544,19 @@ export class AppComponent {
                     this.temp=this.code[pointer].substring(j+8,this.code[pointer].length);
                     if(this.registers[a]!=this.registers[b])
                     pointer=this.find(this.temp,this.names,this.index);
-                    while(this.hazard.length>2)
-                    this.hazard.shift();
-                    
+                                  
                     if(!this.is_forwarded){
-                      this.pipeline_wf("bne", a, b);
+                      this.pipeline_wf("bne", a, b, pointer);
                     }
                     else{
-                      this.pipeline_f("bne", a, b);
+                      this.pipeline_f("bne", a, b, pointer);
                       this.prev_op = "bne";
                     }
+                    this.stalled_inst.push(this.code[pointer+1]);
                     this.stalls++;
                     this.clocks++;
+                    this.hazard.push(-1);
+                    this.hazard.shift();
                     this.hazard.push(-1);
                     this.hazard.shift();
                   }
@@ -573,14 +581,17 @@ export class AppComponent {
                     pointer=this.find(this.temp,this.names,this.index);
 
                     if(!this.is_forwarded){
-                      this.pipeline_wf("beq", a, b);
+                      this.pipeline_wf("beq", a, b, pointer);
                     }
                     else{
-                      this.pipeline_f("beq", a, b);
+                      this.pipeline_f("beq", a, b, pointer);
                       this.prev_op = "beq";
                     }
+                    this.stalled_inst.push(this.code[pointer+1]);
                     this.stalls++;
                     this.clocks++;
+                    this.hazard.push(-1);
+                    this.hazard.shift();
                     this.hazard.push(-1);
                     this.hazard.shift();
                   }
@@ -598,14 +609,17 @@ export class AppComponent {
                     this.temp=this.code[pointer].substring(j+8,this.code[pointer].length);
 
                     if(!this.is_forwarded){
-                      this.pipeline_wf("blt", a, b);
+                      this.pipeline_wf("blt", a, b, pointer);
                     }
                     else{
-                      this.pipeline_f("blt", a, b);
+                      this.pipeline_f("blt", a, b, pointer);
                       this.prev_op = "blt";
                     }
+                    this.stalled_inst.push(this.code[pointer+1]);
                     this.stalls++;
                     this.clocks++;
+                    this.hazard.push(-1);
+                    this.hazard.shift();
                     this.hazard.push(-1);
                     this.hazard.shift();
 
@@ -633,7 +647,12 @@ export class AppComponent {
                 this.stalls++;
                 this.clocks++;
                 this.total_instructions++;
+                this.stalled_inst.push(this.code[pointer]);
                 this.prev_op = "j";
+                this.hazard.push(-1);
+                this.hazard.shift();
+                this.hazard.push(-1);
+                this.hazard.shift();
             }
             else if(this.code[pointer][j]=='l')
             {
@@ -669,10 +688,10 @@ export class AppComponent {
                       c=Number(this.reg_name.get(this.temp));//c=reg t1 index
                       // c=this.registers[c];//value of reg t1 aka memory index
                       if(!this.is_forwarded){
-                        this.pipeline_wf("lw", c, -2);
+                        this.pipeline_wf("lw", c, -2, pointer);
                       }
                       else{
-                        this.pipeline_f("lw", c, -2);
+                        this.pipeline_f("lw", c, -2, pointer);
                         this.prev_op = "lw";
                       }
                       this.hazard.push(a);
@@ -737,6 +756,7 @@ export class AppComponent {
     }
     
     this.IPC = this.total_instructions/this.clocks;
+    console.log(this.stalled_inst);
   }
 
   //to find the labels position
@@ -765,6 +785,8 @@ export class AppComponent {
   this.total_instructions = 0;
   this.is_forwarded=false;
   this.prev_op = "";
+  this.IPC = 0;
+  this.stalled_inst = [""];
 
     this.instructions='';
     this.output=[''];

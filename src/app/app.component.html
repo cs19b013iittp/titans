@@ -97,6 +97,11 @@
 						<br>
 						IPC = {{IPC}}
 						<br>
+						Stalled Instructions:
+						<br>
+						<div *ngFor="let line of stalled_inst; let i=index">
+							{{i}} &nbsp; {{line}}
+						</div>
 					</div>
 				</div>
 			</div>
