@@ -4,6 +4,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 To run
 
+# Phase 1
 This is a very basic version, so the assembly files that are uploaded should not contain tabs(i.e, \t). Instead use spaces(i.e, " ") only, instead of tabs.
 All the operations that are needed to implement a bubble sort along with the specified ones are included. The operations are:
 1. add, addi
@@ -39,6 +40,14 @@ Consecutive arithmetic operations, even if dependencies are present, will not an
 
 ---> The results of the stalls, no. of clock cycles, no. of instructions executed and IPC is shown at the bottom.
 ---> Also the instructions where the stall occurs are outputted at the bottom.
+
+# Phase 3
+2 Levels of cache is implemented in this phase. Both the caches are implemented using LRU replacement policy. The cache is an inclusive cache i.e, while bringing data from memory, it is kept in L1 level of cache and also L2 level of cache.
+
+Implementation:
+1. Two queues are maintained. One for L1 level and other for L2.
+2. Whenever there is a cache miss in both L1 and L2, the data is brought from the memory and pushed into L1 and as well as L2 (i.e, both the arrays).
+3. 
 
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ## Development server
