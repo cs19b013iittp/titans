@@ -42,14 +42,21 @@ Consecutive arithmetic operations, even if dependencies are present, will not an
 ---> Also the instructions where the stall occurs are outputted at the bottom.
 
 # Phase 3
-2 Levels of cache is implemented in this phase. Both the caches are implemented using LRU replacement policy. The cache is an inclusive cache i.e, while bringing data from memory, it is kept in L1 level of cache and also L2 level of cache.
-
+2 Levels of cache is implemented in this phase. Both the caches are implemented using LRU replacement policy. The cache is a non-inclusive cache i.e, while deleting the data from L1 and L2, it is independant of one another. If data is deleted in L1 does not mean to delete it from L2.
 Implementation:
 1. Two queues are maintained. One for L1 level and other for L2.
 2. Whenever there is a cache miss in both L1 and L2, the data is brought from the memory and pushed into L1 and as well as L2 (i.e, both the arrays).
-3. 
+3. The Cache size, Block size, Associativity and Access Latency is taken as input and the number of stalls, miss rate are calculated accordingly.
+4. The memory latency is fixed as 100 cycles (i.e, the number of cycles required to access a memory address when there is a cache miss).
+5. When ever there is a store word(sw) operation, the data is written in all the caches as well as the memory.
+6. When there is a cache hit in L1, it does not go to further levels.
+7. If not found in L1 then it proceeds into L2, and it gets written in L1.
 
+Note: For taking the input (eg: cache size, block size etc), there is a switch button provided in the registers section. By clicking, it will take the necessary information. Also the miss rate after execution is provided at the bottom.
 ---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+
 ## Development server
 
 The present code is modified so that we will be able to host it on heroku to see the web page go to https://titansapp.herokuapp.com/ . else
