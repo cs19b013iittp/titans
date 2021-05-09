@@ -1,3 +1,4 @@
+import { hasInjectableFields } from '@angular/compiler-cli/src/ngtsc/metadata/src/util';
 import { Component } from '@angular/core';
 
 @Component({
@@ -11,6 +12,23 @@ export class AppComponent {
   title = 'titans';
   file:any;
 
+  //for cache
+  public l1size=256;
+  public l2size=1024;
+  public l1blksize=1;
+  public l2blksize=1;
+  public l1associativity=1;
+  public l2associativity=1;
+  public l1latency=1;
+  public l2latency=1;
+  public miss=0;
+  public missrate=0;
+  public memoperations=0;
+  public opencache=false;
+  public l1: number[][]=[ [] ];
+  public noofsetsl1=(this.l1size/this.l1blksize)/this.l1associativity;
+  public l2: number[][]=[ [] ];
+  public noofsetsl2=(this.l2size/this.l2blksize)/this.l2associativity;
   //for pipelining
   public is_forwarded=false;
   public clocks=0;
@@ -46,6 +64,11 @@ export class AppComponent {
     this.registers.push(0);
   }
   
+switch()
+{
+  this.opencache=!this.opencache;
+}
+
   fileChanged(e:any) {
       this.file = e.target.files[0];
   }
@@ -204,6 +227,14 @@ export class AppComponent {
 
   run()
   {
+    for(let i=0;i<this.noofsetsl1;i++)
+    {
+      this.l1.push([-1]);
+    }
+    for(let i=0;i<this.noofsetsl2;i++)
+    {
+      this.l2.push([-1]);
+    }
     this.output=[''];
     this.temp='';
 
@@ -423,6 +454,7 @@ export class AppComponent {
                 else if(this.code[pointer][j+1] == 'w')
                 {
                   j=j+2;
+                  this.memoperations++;
                   let a:number,c:number=0;
                   if(this.code[pointer][j]=='$')
                   {
@@ -454,7 +486,41 @@ export class AppComponent {
 
                       c=this.registers[c];//value of reg t1 aka memory index
                       c+=q/4;//add offset
-                      
+                      if(!this.has(this.l1,c))
+                    {
+                      if(!this.has(this.l2,c))
+                      {
+                        this.stalls+=this.l1latency+this.l2latency+99;
+                        this.clocks+=this.l1latency+this.l2latency+99;
+                        this.insert(c);
+                        this.miss++;
+                        this.hazard[0]=this.hazard[1]=-1;
+                      }
+                      else
+                      {
+                        this.stalls+=this.l1latency+this.l2latency-1;
+                        this.clocks+=this.l1latency+this.l2latency-1
+                        if(this.l1latency+this.l2latency-1==1)
+                        {
+                          this.hazard.shift();
+                          this.hazard.push(-1);
+                        }
+                        else if(this.l1latency+this.l2latency-1>=2)
+                        this.hazard[0]=this.hazard[1]=-1;
+                      }
+                    } 
+                    else
+                    {
+                      this.stalls+=this.l1latency-1;
+                      this.clocks+=this.l1latency-1;
+                      if(this.l1latency-1==1)
+                        {
+                          this.hazard.shift();
+                          this.hazard.push(-1);
+                        }
+                        else if(this.l1latency-1>=2)
+                        this.hazard[0]=this.hazard[1]=-1;
+                    }
                     
                     this.memory[c] = String(this.registers[a]);
                   }
@@ -662,6 +728,7 @@ export class AppComponent {
               if(this.code[pointer][j+1]=='w')
               {
                 j=j+2;
+                this.memoperations++;
                 let a:number=0,c:number;
                   if(this.code[pointer][j]=='$')
                   {
@@ -672,6 +739,13 @@ export class AppComponent {
                     {
                       this.temp=this.code[pointer].substring(j+4,this.code[pointer].length);
                       c=Number(this.variables.get(this.temp));
+                      if(!this.is_forwarded){
+                        this.pipeline_wf("lw", c, -2, pointer);
+                      }
+                      else{
+                        this.pipeline_f("lw", c, -2, pointer);
+                        this.prev_op = "lw";
+                      }
                     }
                     else
                     {
@@ -699,6 +773,44 @@ export class AppComponent {
 
                       c+=q/4;//add offset
                       c = this.registers[c];
+                    }
+                    // checkl1
+                    // check l2
+                    // mem
+                    if(!this.has(this.l1,c))
+                    {
+                      if(!this.has(this.l2,c))
+                      {
+                        this.stalls+=this.l1latency+this.l2latency+99;
+                        this.clocks+=this.l1latency+this.l2latency+99;
+                        this.insert(c);
+                        this.miss++;
+                        this.hazard[0]=this.hazard[1]=-1;
+                      }
+                      else
+                      {
+                        this.stalls+=this.l1latency+this.l2latency-1;
+                        this.clocks+=this.l1latency+this.l2latency-1
+                        if(this.l1latency+this.l2latency-1==1)
+                        {
+                          this.hazard.shift();
+                          this.hazard.push(-1);
+                        }
+                        else if(this.l1latency+this.l2latency-1>=2)
+                        this.hazard[0]=this.hazard[1]=-1;
+                      }
+                    } 
+                    else
+                    {
+                      this.stalls+=this.l1latency-1;
+                      this.clocks+=this.l1latency-1;
+                      if(this.l1latency-1==1)
+                        {
+                          this.hazard.shift();
+                          this.hazard.push(-1);
+                        }
+                        else if(this.l1latency-1>=2)
+                        this.hazard[0]=this.hazard[1]=-1;
                     }
                     this.registers[a]=parseInt( this.memory[c],10);
                   }
@@ -756,8 +868,47 @@ export class AppComponent {
     }
     
     this.IPC = this.total_instructions/this.clocks;
+    this.missrate=this.miss/this.memoperations;
     console.log(this.stalled_inst);
   }
+
+has(l:number[][],n:number)
+{
+  for(let i=0;i<l.length;i++)
+  {
+    for(let j=0;j<l[i].length;j++)
+    {
+      if(l[i][j]==n)
+      return true;
+    }
+  }
+  return false;
+}
+insert(n:number)
+{
+  let j=n%this.noofsetsl1;
+  if(!this.has(this.l1,n))
+  if(this.l1[j].length<this.l1associativity)
+  {
+    this.l1[j].push(n);
+  }
+  else
+  {
+    this.l1[j].shift();
+    this.l1[j].push(n);
+  }
+  j=n%this.noofsetsl2;
+  if(!this.has(this.l2,n))
+  if(this.l2[j].length<this.l2associativity)
+  {
+    this.l2[j].push(n);
+  }
+  else
+  {
+    this.l2[j].shift();
+    this.l2[j].push(n);
+  }
+}
 
   //to find the labels position
   find(s:string,names:any,index:any)
@@ -778,11 +929,15 @@ export class AppComponent {
     for(let i=0;i<32;++i)
     this.registers[i]=0;
 
+
+    //cache
+    this.miss=0;
+    this.l1=[ [] ];
+    this.l2=[ [] ];
     //pipelining
   this.stalls=0;
   this.clocks=0;
   this.hazard = [-1, -1];
-  this.total_instructions = 0;
   this.is_forwarded=false;
   this.prev_op = "";
   this.IPC = 0;

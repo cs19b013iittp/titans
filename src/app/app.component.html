@@ -67,16 +67,73 @@
 				<div class="col-md-12 mt-4 py-2">
 					<div class="shadow container bg-light">
                         <br>
-						<table>
-                            <tr>
-                                <th>Register Name&nbsp;&nbsp;</th>
-                                <th>value</th>
-                            </tr>
-                            <tr *ngFor="let item of registers;let myindex=index;">
-                                <td>R{{myindex}} </td>
-                                <td>{{item}}</td>
-                            </tr>
-                        </table>
+						<button type="button" style="color:darkred;float: right;padding-right: 1em;margin-bottom: 1em;" class="btn btn-default b" (click)="switch()" >
+							<span class="glyphicon glyphicon-refresh"></span> switch
+							  </button>
+						<div *ngIf="!opencache">
+							<table >
+								<tr>
+									<th>Register Name&nbsp;&nbsp;</th>
+									<th>value</th>
+									
+								</tr>
+								<tr *ngFor="let item of registers;let myindex=index;">
+									<td>R{{myindex}} </td>
+									<td>{{item}}</td>
+								</tr>
+							</table>
+						</div>
+						<div *ngIf="opencache">
+							<table >
+								<tr>
+									<th>Cache&nbsp;&nbsp;</th>
+									<th> </th>
+									
+								</tr>
+								<tr>
+									<th>parameter&nbsp;&nbsp;&nbsp;&nbsp;</th>
+									<th> &nbsp;&nbsp;value </th>
+									
+								</tr>
+								<tr>
+									<td>Cache&nbsp;size(L1)</td>
+									<td>&nbsp;&nbsp;	<input type="number" style="width: 40%; height: 50%; margin-bottom: 0.5em;" [(ngModel)]="l1size"> bytes	</td>
+								</tr>
+								<tr>
+									<td>Block&nbsp;size(L1)</td>
+									<td>&nbsp;&nbsp;	<input type="number" style="width: 40%; height: 50%; margin-bottom: 0.5em;" [(ngModel)]="l1blksize"> x4bytes	</td>
+								</tr>
+								<tr>
+									<td>Associativity(L1)</td>
+									<td>&nbsp;&nbsp;	<input type="number" style="width: 40%; height: 50%; margin-bottom: 0.5em;" [(ngModel)]="l1associativity"> units	</td>
+								</tr>
+								<tr>
+									<td>Access&nbsp;latency(L1)</td>
+									<td>&nbsp;&nbsp;	<input type="number" style="width: 40%; height: 50%; margin-bottom: 0.5em;" [(ngModel)]="l1latency"> cycles	</td>
+								</tr>
+								<tr>
+									<td>Cache&nbsp;size(L2)</td>
+									<td>&nbsp;&nbsp;	<input type="number" style="width: 40%; height: 50%; margin-bottom: 0.5em;" [(ngModel)]="l2size"> bytes	</td>
+								</tr>
+								<tr>
+									<td>Block&nbsp;size(L2)</td>
+									<td>&nbsp;&nbsp;	<input type="number" style="width: 40%; height: 50%; margin-bottom: 0.5em;" [(ngModel)]="l2blksize"> x4bytes	</td>
+								</tr>
+								<tr>
+									<td>Associativity(L2)</td>
+									<td>&nbsp;&nbsp;	<input type="number" style="width: 40%; height: 50%; margin-bottom: 0.5em;" [(ngModel)]="l2associativity"> units	</td>
+								</tr>
+								<tr>
+									<td>Access&nbsp;latency(L2)</td>
+									<td>&nbsp;&nbsp;	<input type="number" style="width: 40%; height: 50%; margin-bottom: 0.5em;" [(ngModel)]="l2latency"> cycles	</td>
+								</tr>
+								<!-- <tr *ngFor="let item of registers;let myindex=index;">
+									<td>R{{myindex}} </td>
+									<td>{{item}}</td>
+								</tr> -->
+							</table>
+							we are assuming memory latency to be 100cycles
+						</div>
                           <br>
 						  
 					</div>
@@ -92,6 +149,8 @@
 						Total no. of Instructions = {{total_instructions}}
 						<br>
 						Total no. of Stalls = {{stalls}}
+						<br>
+						Miss Rate = {{missrate}}
 						<br>
 						Total Clock Cycles  = {{clocks}}
 						<br>
