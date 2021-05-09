@@ -53,10 +53,6 @@ Implementation:
 7. If not found in L1 then it proceeds into L2, and it gets written in L1.
 
 Note: For taking the input (eg: cache size, block size etc), there is a switch button provided in the registers section. By clicking, it will take the necessary information. Also the miss rate after execution is provided at the bottom.
-https://github.com/vaibhav-gelle/titans/blob/master/Screenshot%20(676).png
-https://github.com/vaibhav-gelle/titans/blob/master/Screenshot%20(677).png
-https://github.com/vaibhav-gelle/titans/blob/master/Screenshot%20(678).png
-
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
